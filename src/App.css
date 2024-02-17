@@ -11,6 +11,12 @@ body, html {
   overflow-x: hidden; /* Prevent horizontal scrollbar */
 }
 
+.tangerine-bold {
+  font-family: "Tangerine", cursive;
+  font-weight: 700;
+  font-style: normal;
+}
+
 .logo {
   height: 6em;
   padding: 1.5em;
