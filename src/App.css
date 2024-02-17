@@ -5,6 +5,12 @@
   text-align: center;
 }
 
+body, html {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden; /* Prevent horizontal scrollbar */
+}
+
 .logo {
   height: 6em;
   padding: 1.5em;

@@ -1,71 +1,53 @@
-import React from 'react';
-//import logo from '../narghilea.png';
-import {
-  Container, Row, Col, Form, Input, Button, Navbar, Nav,
-  NavbarBrand, NavLink, NavItem, UncontrolledDropdown,
-  DropdownToggle, DropdownMenu, DropdownItem
-} from 'reactstrap';
+// import HomeIcon from '@mui/icons-material/Home';
+import ListItemButton from '@mui/material/ListItemButton';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
+import PeopleIcon from '@mui/icons-material/People';
+// import AdminIcon from '@mui/icons-material/AdminPanelSettings';
+import {useNavigate} from 'react-router-dom';
+import {Divider} from '@mui/material';
+import {History, AccessTime} from '@mui/icons-material';
+import BadgeIcon from '@mui/icons-material/Badge';
 
-const AVATAR = 'https://www.gravatar.com/avatar/429e504af19fc3e1cfa5c4326ef3394c?s=240&d=mm&r=pg';
+export default function Header() {
+  const headerStyle: React.CSSProperties = {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: '1vw',
+    backgroundColor: '#f0f0f0',
+    width: '100%', // Ensure header extends to full width
+    position: 'fixed', // Optionally make the header fixed at the top
+    top: 0, // Position at the top
+    left: 0, // Align to the left
+    zIndex: 1000, // Ensure header is above other content
+  };
 
-const Header: React.FC = () => (
-  <header>
-    <Navbar fixed="top" color="light" light expand="xs" className="border-bottom border-gray bg-white" style={{ height: 80 }}>
+  const logoStyle: React.CSSProperties = {
+    fontSize: '4vw',
+    fontWeight: 'bold',
+  };
 
-      <Container>
-        <Row className="position-relative w-100 align-items-center g-0">
+  const buttonStyle: React.CSSProperties = {
+    padding: '1vw 2vw',
+    fontSize: '2vw',
+    margin: '0 1vw',
+    backgroundColor: '#007bff',
+    color: 'white',
+    border: 'none',
+    borderRadius: '5px',
+    cursor: 'pointer',
+  };
 
-          <Col className="d-none d-lg-flex justify-content-start">
-            <Nav className="mrx-auto" navbar>
-
-              <NavItem className="d-flex align-items-center">
-                <NavLink className="font-weight-bold" href="/">
-                  <img src={AVATAR} alt="avatar" className="img-fluid rounded-circle" style={{ width: 36 }} />
-                </NavLink>
-              </NavItem>
-
-              <NavItem className="d-flex align-items-center">
-                <NavLink className="font-weight-bold" href="/">Home</NavLink>
-              </NavItem>
-
-              <NavItem className="d-flex align-items-center">
-                <NavLink className="font-weight-bold" href="/">Events</NavLink>
-              </NavItem>
-
-              <UncontrolledDropdown className="d-flex align-items-center" nav inNavbar>
-                <DropdownToggle className="font-weight-bold" nav caret>Learn</DropdownToggle>
-                <DropdownMenu end>
-                  <DropdownItem className="font-weight-bold text-secondary text-uppercase" header disabled>Learn React</DropdownItem>
-                  <DropdownItem divider />
-                  <DropdownItem>Documentation</DropdownItem>
-                  <DropdownItem>Tutorials</DropdownItem>
-                  <DropdownItem>Courses</DropdownItem>
-                </DropdownMenu>
-              </UncontrolledDropdown>
-
-            </Nav>
-          </Col>
-
-          <Col className="d-flex justify-content-xs-start justify-content-lg-center">
-            <NavbarBrand className="d-inline-block p-0" href="/" style={{ width: 80 }}>
-              {/* Uncomment and replace `logo` with actual import if needed */}
-              {/* <img src={logo} alt="logo" className="position-relative img-fluid" /> */}
-            </NavbarBrand>
-          </Col>
-
-          <Col className="d-none d-lg-flex justify-content-end">
-            {/* Corrected inline prop usage */}
-            <Form > {/* or simply <Form inline> */}
-              <Input type="search" className="mr-3" placeholder="Search React Courses" />
-              <Button type="submit" color="info" outline>Search</Button>
-            </Form>
-          </Col>
-
-        </Row>
-      </Container>
-
-    </Navbar>
-  </header>
-);
-
-export default Header;
+  return (
+    <div style={headerStyle}>
+      <div style={logoStyle}>Logo</div>
+      <div>
+        <button style={buttonStyle}>Home</button>
+        <button style={buttonStyle}>About</button>
+        <button style={buttonStyle}>Contact</button>
+      </div>
+    </div>
+  );
+};
