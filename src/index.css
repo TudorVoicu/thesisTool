@@ -24,10 +24,9 @@ a:hover {
 
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
   min-width: 320px;
-  min-height: 100vh;
+  height: 100vh; /* Ensures body takes full viewport height */
+  display: flex; /* Or 'flex' if needed for other layout aspects, but manage children sizing and overflow carefully */
 }
 
 h1 {
