@@ -4,11 +4,28 @@ import { OrbitControls } from '@react-three/drei';
 import { useFiles } from '../../FilesContext';
 import SingleScene from './SingleScene';
 import CombinedStreamlinesScene from './CombinedStreamlinesScene';
+import SynchronizedOrbitControls from './SynchronizedOrbitControls';
 
 const ThreeCanvas = () => {
-  const { fileGroups, cameraState, allInOneScene, coloringFiles, center, toggleCenter } = useFiles();
+  const { fileGroups, cameraState, allInOneScene, coloringFiles, center, toggleCenter, updateCameraPosition } = useFiles();
 
   const controls = useRef<any>(null);
+
+  useEffect(() => {
+    if (controls.current) {
+      const handleChange = () => {
+        const { x, y, z } = controls.current.object.position;
+        updateCameraPosition({ position: [x, y, z] });
+      };
+      controls.current.addEventListener('change', handleChange);
+  
+      return () => {
+        if (controls.current) {
+          controls.current.removeEventListener('change', handleChange);
+        }
+      };
+    }
+  }, [updateCameraPosition, cameraState.position]); 
   
   //consider removing this
   useEffect(() => {
@@ -42,7 +59,7 @@ const ThreeCanvas = () => {
                     <SingleScene tckFiles={group.tckFiles}/>
                 </>)}
                 
-                <OrbitControls ref={controls} enableDamping={false}/>
+                <SynchronizedOrbitControls controlsRef={controls}/>
               </Canvas>
             </div>
           ))}

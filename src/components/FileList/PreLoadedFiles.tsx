@@ -7,8 +7,9 @@ interface Items {
     value: FourDimArray[],
     label: string
     selected: boolean;
-    mapping: number[][][];
-    distances: number[][][][];
+    mapping: number[][];
+    distances: number[][][];
+    colorDiff: number[][][];
 }
 
 const PreLoadedFiles: React.FC = () => {
@@ -25,57 +26,51 @@ const PreLoadedFiles: React.FC = () => {
             const distancesRight = await fetch(`${base}preloadedArrays/${folder}/distances_right.json`).then(res => res.json());
             const mappingsLeft = await fetch(`${base}preloadedArrays/${folder}/mapping_left.json`).then(res => res.json());
             const mappingsRight = await fetch(`${base}preloadedArrays/${folder}/mapping_right.json`).then(res => res.json());
-            
-            return [[post, pre], [distancesLeft, distancesRight], [mappingsLeft, mappingsRight]];
-        };
+            const colorLeft = await fetch(`${base}preloadedArrays/${folder}/color_right.json`).then(res => res.json());
+            const colorRight = await fetch(`${base}preloadedArrays/${folder}/color_right.json`).then(res => res.json());
 
+            return [
+                {label: folder + "_left", value: [[post[0]], [pre[0]]], distances: distancesLeft, mapping: mappingsLeft, selected: false, colorDiff: colorLeft},
+                {label: folder + "_right", value: [[post[1]], [pre[1]]], distances: distancesRight, mapping: mappingsRight, selected: false, colorDiff: colorRight}
+            ];
+        };
+    
         const loadData = async () => {
-            const folders = ['AF_100', 'AF'];  // Example folder names, adjust as needed
-            const promises = folders.map(folder => loadJsonData(folder).then(data => ({
-                label: folder,
-                value: data[0],
-                distances: data[1],
-                mapping: data[2],
-                selected:false
-            })));
-            const items = await Promise.all(promises);
-            setItems(items);
+            const folders = ['AF_100', 'CST', 'CG', 'IFO'];  // Example folder names, adjust as needed
+            const promises = folders.map(async folder => await loadJsonData(folder));
+            const itemsArray = await Promise.all(promises);
+            setItems(itemsArray.flat());
         };
-
+    
         loadData();
     }, []);
     
     //loads the files onto the context's filelist
     useEffect(() => {
         emptyFileGroup();
-        let counter = 0;
-        items.map((item) => {
-            if(item.selected){
-            item.value.map((patient, indexit) => {
-                const label = indexit === 0? "POST_" : "PRE_"
-                const perFile = patient.map((tck, index) => {
-                    return {
-                        name: index === 0 ? (label + item.label + "_left") : (label + item.label + "_right"),
+        items.forEach((item, ind) => {
+            if (item.selected) {
+                item.value.forEach((patient, indexit) => {
+                    const label = indexit === 0 ? `POST_` : `PRE_`;
+                    const perFile = patient.map((tck, index) => ({
+                        name: `${label}${item.label}_${index}`,
                         coordinates: tck,
-                        distance: item.distances[indexit][index],
-                        mapping: item.mapping[indexit][index],
+                        distance: item.distances[index],
+                        mapping: item.mapping[index],
                         isVisible: true,
                         opacity: 0.5,
                         color: '#fc0328',
-                    };
-                })
-                console.log(perFile);
-                addFileGroup( perFile );
-            })
-            counter+=2;
-        }
-        })
-    }, [items])
+                        colorDiff: item.colorDiff[index]
+                    }));
+                    addFileGroup(perFile);
+                });
+            }
+        });
+    }, [items]);
 
     useEffect(() => {
-        console.log(fileGroups)
         for(let i=0; i<fileGroups.length; i+=2){
-            computeCenterAndSubtract;
+            computeCenterAndSubtract(i);
         }
     }, [fileGroups])
 
@@ -104,7 +99,6 @@ const PreLoadedFiles: React.FC = () => {
 
     function computeCenterAndSubtract(index: number): void {
         // Validate indices
-        console.log(fileGroups)
         if (
           !fileGroups[index] || 
           !fileGroups[index + 1] || 
@@ -116,11 +110,8 @@ const PreLoadedFiles: React.FC = () => {
       
         let bundles = [
           fileGroups[index].tckFiles[0],
-          fileGroups[index].tckFiles[1],
           fileGroups[index + 1].tckFiles[0],
-          fileGroups[index + 1].tckFiles[1],
         ];
-      
         // Calculate the center
         let voxel = [0, 0, 0];
         for (let k = 0; k < bundles.length; k++) {
@@ -162,15 +153,13 @@ const PreLoadedFiles: React.FC = () => {
         }
 
         fileGroups[index].tckFiles[0] = bundles[0];
-        fileGroups[index].tckFiles[1] = bundles[1];
-        fileGroups[index + 1].tckFiles[0] = bundles[2];
-        fileGroups[index + 1].tckFiles[1] = bundles[3];
+        fileGroups[index + 1].tckFiles[0] = bundles[1];
     }
 
     const renderValue = (selected: string[]) => selected.join(', ');
 
     return (
-        <FormControl fullWidth>
+        <FormControl fullWidth sx={{marginTop : "1rem", marginBottom: '1rem'}}>
             <InputLabel>Subfolders</InputLabel>
             <Select
                 multiple

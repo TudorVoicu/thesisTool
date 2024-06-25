@@ -1,26 +1,39 @@
-// SynchronizedOrbitControls.jsx
-//archived
-import React from 'react';
-import { useThree } from '@react-three/fiber';
+// SynchronizedOrbitControls.tsx
+import React, { useRef, useEffect } from 'react';
+import { PerspectiveCamera, OrthographicCamera } from 'three';
 import { OrbitControls } from '@react-three/drei';
 import { useFiles } from '../../FilesContext';
+import { useThree } from '@react-three/fiber';
 
-const SynchronizedOrbitControls: React.FC = () => {
-  const { camera, gl } = useThree();
+interface SynchronizedOrbitControlsProps {
+  controlsRef: React.MutableRefObject<any>;
+}
+
+const SynchronizedOrbitControls : React.FC<SynchronizedOrbitControlsProps> = ({ controlsRef }) => {
   const { updateCameraPosition, cameraState } = useFiles();
+  const { camera, gl } = useThree();
+  useEffect(() => {
+    if (controlsRef.current) {
+      const handleChange = () => {
+        const { x, y, z } = controlsRef.current.object.position;
+        updateCameraPosition({
+          position: [x, y, z],
+          rotation: [camera.rotation.x, camera.rotation.y, camera.rotation.z],
+          zoom: camera instanceof PerspectiveCamera ? camera.fov : camera.zoom, // Check if the camera is Perspective to access fov
+        });
+      };
 
-  const onCameraChange = React.useCallback(() => {
-    // Update global camera state only when synchronization is enabled
-    if (cameraState.synchronized) {
-      updateCameraPosition({
-        position: [camera.position.x, camera.position.y, camera.position.z],
-        rotation: [camera.rotation.x, camera.rotation.y, camera.rotation.z],
-        zoom: 'fov' in camera ? camera.fov : cameraState.zoom, // Adjust based on camera type
-      });
+      controlsRef.current.addEventListener('change', handleChange);
+
+      return () => {
+        if (controlsRef.current) {
+          controlsRef.current.removeEventListener('change', handleChange);
+        }
+      };
     }
-  }, [camera, updateCameraPosition, cameraState.synchronized]);
+  }, [updateCameraPosition, cameraState.synchronized, camera, controlsRef]);
 
-  return <OrbitControls args={[camera, gl.domElement]} onChange={onCameraChange} />;
+  return <OrbitControls ref={controlsRef} args={[camera, gl.domElement]} enableDamping={false}/>;
 };
 
 export default SynchronizedOrbitControls;

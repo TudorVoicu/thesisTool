@@ -1,14 +1,32 @@
 //FileList.tsx
 import React from 'react';
 import { useFiles } from '../../FilesContext';
-import { Checkbox, FormControlLabel, Slider, TextField, Switch, Button } from '@mui/material';
+import { Checkbox, FormControlLabel, Slider, TextField, Switch, Button, Box } from '@mui/material';
 import PreLoadedFiles from './PreLoadedFiles';
 
 const FileList: React.FC = () => {
   const { fileGroups, toggleTckFileVisibility, changeTckFileColor, changeTckFileOpacity, toggleAllInOneScene, makeHeatmap, 
-    makeStreamlines, heatmap, streamlines, setCellSize, setGridSize, changeColoringFiles, setMaxColorDistance, toggleViewDistances } = useFiles();
+    makeStreamlines, heatmap, streamlines, setCellSize, setGridSize, changeColoringFiles, setMaxColorDistance, toggleViewDistances, synchronizeCameras, cameraState, toggleViewFlow, viewDistances, viewFlow } = useFiles();
 
   const [isColored, setIsColored] = React.useState<boolean>(false);
+
+  const [internalViewFlow, setInternalViewFlow] = React.useState(viewFlow);
+  const [internalViewDistances, setInternalViewDistnaces] = React.useState(viewDistances);
+
+  const [internalDistanceMeter, setInternalDistanceMeter] = React.useState(20);
+  const [internalFlowMeter, setInternalFlowMeter] = React.useState(0.25);
+  const [internalMeter, setInternalMeter] = React.useState(0);
+
+  React.useEffect(() => {
+    setInternalViewDistnaces(viewDistances);
+    if(viewDistances) setInternalMeter(internalDistanceMeter);
+  }, [viewDistances]);
+
+  React.useEffect(() => {
+    setInternalViewFlow(viewFlow);
+    if(viewFlow)  setInternalMeter(internalFlowMeter);
+  }, [viewFlow]);
+
   const [value, setValue] = React.useState<string>("");
 
   const handleAllInOneScene = () => {
@@ -58,7 +76,6 @@ const FileList: React.FC = () => {
       }
   
       const data = await response.json();
-      console.log(data)
       changeColoringFiles(data.mapping, data.distances);
     } catch (error) {
       console.error('There was a problem with the fetch operation:', error);
@@ -71,15 +88,22 @@ const FileList: React.FC = () => {
   }
 
   function handleChange(event: React.ChangeEvent<HTMLInputElement>): void {
-    const newValue = event.target.value;
+    const newValue = parseFloat(event.target.value);
+    console.log(newValue)
         // Check if the new value is a non-negative number
-        if (!newValue || /^\d*\.?\d*$/.test(newValue)) {
-            setValue(newValue);
-            setMaxColorDistance(parseInt(newValue));
+        if (newValue) {
+            if(internalViewDistances) setInternalDistanceMeter(newValue);
+            else  setInternalFlowMeter(newValue);
+            setInternalMeter(newValue);
         }
   }
 
+  React.useEffect(() => {
+    setMaxColorDistance(internalMeter);
+  }, [internalMeter])
+
   return (
+    <>
     <div className="file-list">
       <PreLoadedFiles />
       <FormControlLabel
@@ -94,14 +118,28 @@ const FileList: React.FC = () => {
         control={<Switch onChange={streamlinesVis} defaultChecked />}
         label="Streamlines"
       />
+      {/* <FormControlLabel
+        control={<Switch onChange={() => synchronizeCameras(!cameraState.synchronized)} defaultChecked/>}
+        label="Syncronize Cameras"
+      /> */}
       <FormControlLabel
-        control={<Switch onChange={toggleViewDistances} />}
+        control={<Switch onChange={toggleViewDistances} checked={internalViewDistances}/>}
         label="Distance Coloring"
       />
-      {/* <FormControlLabel
-        control={<Switch onChange={toggleCenterBundle} />}
-        label="Center Bundle"
-      /> */}
+      <FormControlLabel
+        control={<Switch onChange={toggleViewFlow} checked={internalViewFlow}/>}
+        label="Flow Coloring"
+      />
+      <TextField
+            type="number"
+            label="Set Max Distance"
+            variant="outlined"
+            value={internalMeter}
+            onChange={handleChange}
+            inputProps={{ min: 0, step: 1 }}  // ensures only numbers >= 0 can be entered
+            fullWidth
+            sx={{marginTop : '1rem', marginBottom:'1rem'}}
+          />
       {heatmap && (
         <div>
           <Slider
@@ -165,7 +203,7 @@ const FileList: React.FC = () => {
         </>
       )}
       
-      {fileGroups.length === 2 && fileGroups[0].tckFiles.length === 1 && fileGroups[1].tckFiles.length === 1 && (
+      {/* {fileGroups.length === 2 && fileGroups[0].tckFiles.length === 1 && fileGroups[1].tckFiles.length === 1 && (
         <>
           <Button
           onClick={() => processColoring()}
@@ -173,22 +211,11 @@ const FileList: React.FC = () => {
             Distance Coloring
           </Button>
         </>
-      )}
-      {isColored && (
-        <>
-          <TextField
-            type="number"
-            label="Set Max Distance"
-            variant="outlined"
-            value={value}
-            onChange={handleChange}
-            inputProps={{ min: "0", step: "1" }}  // ensures only numbers >= 0 can be entered
-            fullWidth
-          />
-        </>
-      )}
+      )} */}
+
       
     </div>
+    </>
   );
 };
 

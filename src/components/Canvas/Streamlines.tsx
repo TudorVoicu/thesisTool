@@ -53,7 +53,7 @@ const Streamline: React.FC<{ points: number[][]; opacity: number; visibility: bo
   return <primitive object={new Line(geometry, material)} />;
 };
 
-const StreamlineColor: React.FC<{ points: number[][]; opacity: number; visibility: boolean; distances: number[]; colorStart: string; colorEnd:string }> = ({ points, opacity, visibility, distances, colorStart, colorEnd }) => {
+const StreamlineColor: React.FC<{ points: number[][]; opacity: number; visibility: boolean; distances: number[]; colorStart: string; colorEnd:string, maxColor:number }> = ({ points, opacity, visibility, distances, colorStart, colorEnd, maxColor }) => {
   const geometry = useMemo(() => {
     const vertices = points.flat();
     const distanceAttr = []; // Calculate per-segment distances for shader
@@ -71,7 +71,7 @@ const StreamlineColor: React.FC<{ points: number[][]; opacity: number; visibilit
         attach="material"
         colorStart={new THREE.Color(colorStart)}
         colorEnd={new THREE.Color(colorEnd)}
-        maxDist={20}  
+        maxDist={maxColor}  
         opacity={opacity}
         transparent={true}
         visible={visibility}
@@ -81,7 +81,7 @@ const StreamlineColor: React.FC<{ points: number[][]; opacity: number; visibilit
 };
 
 const Streamlines: React.FC<StreamlinesProps> = ({ tckFiles }) => {
-  const {maxColorDistance, viewDistances} = useFiles();
+  const {maxColorDistance, viewDistances, viewFlow} = useFiles();
 
   React.useEffect(() => {
 
@@ -110,22 +110,42 @@ const Streamlines: React.FC<StreamlinesProps> = ({ tckFiles }) => {
             visibility={file.isVisible}
             colorStart={file.color}
             colorEnd={ColorUtils.getComplementaryColorHex(file.color)}
+            maxColor={maxColorDistance}
           />
           
         )) : null
       )}
       </>) : (<>
-        {tckFiles.map((file, fileIndex) =>
+        {(viewFlow) ? (<>
+          {tckFiles.map((file, fileIndex) =>
+        
           file.isVisible ? file.coordinates.map((streamline, streamlineIndex) => (
-            <Streamline
+            <StreamlineColor
               key={`${fileIndex}-${streamlineIndex}`}
               points={streamline}
+              distances={file.colorDiff && file.mapping ? file.colorDiff[file.mapping[file.mapping[streamlineIndex]]] : []} // Pass the correct distances array
               opacity={file.opacity}
               visibility={file.isVisible}
-              color={file.color}
+              colorStart={file.color}
+              colorEnd={ColorUtils.getComplementaryColorHex(file.color)}
+              maxColor={maxColorDistance}
             />
-          )) : null
-        )}
+            
+            )) : null
+          )}
+        </>) : (<>
+          {tckFiles.map((file, fileIndex) =>
+            file.isVisible ? file.coordinates.map((streamline, streamlineIndex) => (
+              <Streamline
+                key={`${fileIndex}-${streamlineIndex}`}
+                points={streamline}
+                opacity={file.opacity}
+                visibility={file.isVisible}
+                color={file.color}
+              />
+            )) : null
+          )}
+        </>)}
       </>)}
       
     </>

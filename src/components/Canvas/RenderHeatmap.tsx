@@ -45,6 +45,7 @@ const RenderHeatmap: React.FC<RenderHeatmapProps> = ({ projectedCoordinates, onR
     
 
         projectedCoordinates.forEach(file => {
+            console.log(file)
             let prefix = file.name.slice(0, 3);
             let visible = false;
             fileGroups.forEach(f => f.tckFiles.forEach(tckFile => {

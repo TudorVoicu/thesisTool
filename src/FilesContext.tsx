@@ -1,5 +1,6 @@
 //FileContext.tsx
 import React, { createContext, useContext, useState, ReactNode, Dispatch, SetStateAction } from 'react';
+import { Flow } from 'three/examples/jsm/Addons.js';
 
 interface TckFile {
   name: string;
@@ -9,6 +10,7 @@ interface TckFile {
   opacity: number;
   mapping :number[] | [];
   distance : number[][] | [];
+  colorDiff: number[][] | []
 }
 
 interface FileGroup {
@@ -21,6 +23,7 @@ interface StreamlinesProps {
   tckFiles: TckFile[];
   mapping?: number[];
   distances?: number[][];
+  colorDiff?: number[][];
 }
 
 interface CameraState {
@@ -71,7 +74,9 @@ interface FilesContextType {
   maxColorDistance:number;
   setMaxColorDistance:Dispatch<SetStateAction<number>>;
   viewDistances: boolean;
+  viewFlow:boolean;
   toggleViewDistances: () => void;
+  toggleViewFlow: () => void;
 }
 
 const FilesContext = createContext<FilesContextType | undefined>(undefined);
@@ -80,7 +85,7 @@ export const FilesProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
   const [cameraState, setCameraState] = useState<CameraState>({
     position: [0, 0, 50], 
-    synchronized: false,
+    synchronized: true,
     zoom: 1,
     rotation: [0,0,0],
   });
@@ -92,9 +97,16 @@ export const FilesProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   };
 
   const [viewDistances, setViewDistances] = useState<boolean>(false);
+  const [viewFlow, setViewFlow] = useState<boolean>(false);
 
   const toggleViewDistances = () => {
     setViewDistances(!viewDistances);
+    setViewFlow(false);
+  }
+
+  const toggleViewFlow = () => {
+    setViewFlow(!viewFlow);
+    setViewDistances(false);
   }
 
   const [cellSize, setCellSize] = useState<number>(0.05);
@@ -106,7 +118,7 @@ export const FilesProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     setHeatmap(prevState => !prevState);
   }
 
-  const [maxColorDistance, setMaxColorDistance] = useState<number>(30);
+  const [maxColorDistance, setMaxColorDistance] = useState<number>(20);
   const [toggleCenter, setToggleCenter] = useState<boolean>(false);
   const [center, setCenter] = useState<[number, number, number] | null>(null);
 
@@ -219,7 +231,9 @@ export const FilesProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       maxColorDistance,
       emptyFileGroup,
       toggleViewDistances,
-      viewDistances
+      toggleViewFlow,
+      viewDistances,
+      viewFlow
     }}>
       {children}
     </FilesContext.Provider>
