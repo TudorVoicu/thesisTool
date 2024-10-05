@@ -1,7 +1,7 @@
 {
   "name": "sample-app",
   "private": true,
-  "homepage": "https://tudorvoicu.github.io/Website-Trp/",
+  "homepage": "https://tudorvoicu.github.io/thesisTool/",
   "version": "0.1.0",
   "type": "module",
   "scripts": {
