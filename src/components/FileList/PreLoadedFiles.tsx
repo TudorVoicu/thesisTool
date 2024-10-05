@@ -72,7 +72,7 @@ const PreLoadedFiles: React.FC = () => {
     //loads the files onto the context's filelist
     useEffect(() => {
         emptyFileGroup();
-        items.forEach((item, ind) => {
+        items.forEach((item) => {
             if (item.selected) {
                 item.value.forEach((patient, indexit) => {
                     const label = indexit === 0 ? `POST_` : `PRE_`;

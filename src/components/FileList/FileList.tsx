@@ -1,17 +1,16 @@
 //FileList.tsx
 import React from 'react';
 import { useFiles } from '../../FilesContext';
-import { Checkbox, FormControlLabel, Slider, TextField, Switch, Button, Box, FormGroup, AccordionDetails, Accordion, Typography, AccordionSummary } from '@mui/material';
+import { Checkbox, FormControlLabel, Slider, TextField, Switch, Box, FormGroup, AccordionDetails, Accordion, Typography, AccordionSummary } from '@mui/material';
 import PreLoadedFiles from './PreLoadedFiles';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
-import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 
 const FileList: React.FC = () => {
   const { fileGroups, toggleTckFileVisibility, changeTckFileColor, changeTckFileOpacity, toggleAllInOneScene, makeHeatmap, 
-    makeStreamlines, heatmap, streamlines, setCellSize, setGridSize, changeColoringFiles, setMaxColorDistance, toggleViewDistances, 
-    synchronizeCameras, cameraState, toggleViewFlow, viewDistances, viewFlow, viewDirColoring, toggleViewDirColoring } = useFiles();
+    makeStreamlines, heatmap, streamlines, setCellSize, setGridSize, setMaxColorDistance, toggleViewDistances,
+     toggleViewFlow, viewDistances, viewFlow, viewDirColoring, toggleViewDirColoring } = useFiles();
 
-  const [isColored, setIsColored] = React.useState<boolean>(false);
+  //const [isColored, setIsColored] = React.useState<boolean>(false);
 
   const [internalViewFlow, setInternalViewFlow] = React.useState(viewFlow);
   const [internalViewDistances, setInternalViewDistnaces] = React.useState(viewDistances);
@@ -36,7 +35,7 @@ const FileList: React.FC = () => {
     setInternalViewDirColoring(viewDirColoring);
   })
 
-  const [value, setValue] = React.useState<string>("");
+  //const [value, setValue] = React.useState<string>("");
 
   const handleAllInOneScene = () => {
     toggleAllInOneScene();
@@ -74,31 +73,31 @@ const FileList: React.FC = () => {
     return customValues[index];
   };
 
-  async function processArrays(array1: number[][][], array2: number[][][]) {
-    try {
-      const response = await fetch('http://127.0.0.1:5000/color_distance', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ array1, array2 }),
-      });
+  // async function processArrays(array1: number[][][], array2: number[][][]) {
+  //   try {
+  //     const response = await fetch('http://127.0.0.1:5000/color_distance', {
+  //       method: 'POST',
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //       },
+  //       body: JSON.stringify({ array1, array2 }),
+  //     });
   
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
+  //     if (!response.ok) {
+  //       throw new Error('Network response was not ok');
+  //     }
   
-      const data = await response.json();
-      changeColoringFiles(data.mapping, data.distances);
-    } catch (error) {
-      console.error('There was a problem with the fetch operation:', error);
-    }
-  }
+  //     const data = await response.json();
+  //     changeColoringFiles(data.mapping, data.distances);
+  //   } catch (error) {
+  //     console.error('There was a problem with the fetch operation:', error);
+  //   }
+  // }
 
-  function processColoring(): void {
-    setIsColored(true);
-    processArrays(fileGroups[0].tckFiles[0].coordinates, fileGroups[1].tckFiles[0].coordinates);
-  }
+  // function processColoring(): void {
+  //   //setIsColored(true);
+  //   processArrays(fileGroups[0].tckFiles[0].coordinates, fileGroups[1].tckFiles[0].coordinates);
+  // }
 
   function handleChange(event: React.ChangeEvent<HTMLInputElement>): void {
     const value = event.target.value;
@@ -184,13 +183,13 @@ const FileList: React.FC = () => {
           step={100 / (customValues.length - 1)} // Equal spacing
           valueLabelDisplay="auto"
           valueLabelFormat={(value: any) => getCustomValue(value)}
-          onChangeCommitted={(_e: any, value: number) => cellSizeSlider(value as number)}
+          onChangeCommitted={(_e: any, value: number) => cellSizeSlider(value)}
           marks={heatmapMarks}
           />  
           <Slider
           defaultValue={200}
           step={100} // Equal spacing
-          onChangeCommitted={(_e: any, value: number) => gridSizeSlider(value as number)}
+          onChangeCommitted={(_e: any, value: number) => gridSizeSlider(value)}
           min={100}
           max={500}
           />  

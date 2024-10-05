@@ -1,12 +1,11 @@
-import React, { useRef, useMemo } from 'react';
-import { BufferGeometry, Float32BufferAttribute, LineBasicMaterial, Line, Color, Mesh } from 'three';
+import React, { useMemo } from 'react';
+import { BufferGeometry, Float32BufferAttribute, LineBasicMaterial, Line } from 'three';
 import StreamlinesProps from "../../FilesContext";
 import { extend, ReactThreeFiber } from '@react-three/fiber';
 import { shaderMaterial } from '@react-three/drei';
 import * as THREE from 'three';
 import { useFiles } from '../../FilesContext';
 import { ColorUtils } from './ColorUtils';
-import { MeshLine, MeshLineMaterial } from 'three.meshline';
 
 const DirectionalColorShaderMaterial = shaderMaterial(
   // Uniforms
@@ -145,7 +144,6 @@ const Streamline: React.FC<{ points: number[][]; opacity: number; visibility: bo
 };
 
 const StreamlineColor: React.FC<{ points: number[][]; opacity: number; visibility: boolean; distances: number[]; colorStart: string; colorEnd:string, maxColor:number }> = ({ points, opacity, visibility, distances, colorStart, colorEnd, maxColor }) => {
-  const hasDistanceLessThanOne = distances.some(distance => distance < 1);
   // if (!hasDistanceLessThanOne) {
   //   // If none of the distances are less than 1, do not render the component
   //   return null;

@@ -16,7 +16,7 @@
     "@emotion/react": "^11.11.3",
     "@emotion/styled": "^11.11.0",
     "@mui/icons-material": "^5.15.10",
-    "@mui/material": "^5.15.10",
+    "@mui/material": "^6.1.2",
     "@react-three/drei": "^9.99.5",
     "@react-three/fiber": "^8.15.16",
     "axios": "^1.6.7",
@@ -30,7 +30,7 @@
     "three.meshline": "^1.4.0"
   },
   "devDependencies": {
-    "@types/react": "^18.2.55",
+    "@types/react": "^18.3.11",
     "@types/react-dom": "^18.2.19",
     "@typescript-eslint/eslint-plugin": "^6.21.0",
     "@typescript-eslint/parser": "^6.21.0",
