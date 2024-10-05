@@ -22,14 +22,14 @@ const PreLoadedFiles: React.FC = () => {
     useEffect(() => {
         const base = import.meta.env.BASE_URL;
         const loadJsonData = async (folder: string) => {
-            const pre = await fetch(`${base}preloadedArrays/${folder}/pre.json`).then(res => res.json());
-            const post = await fetch(`${base}preloadedArrays/${folder}/post.json`).then(res => res.json());
-            const distancesLeft = await fetch(`${base}preloadedArrays/${folder}/distances_left.json`).then(res => res.json());
-            const distancesRight = await fetch(`${base}preloadedArrays/${folder}/distances_right.json`).then(res => res.json());
-            const mappingsLeft = await fetch(`${base}preloadedArrays/${folder}/mapping_left.json`).then(res => res.json());
-            const mappingsRight = await fetch(`${base}preloadedArrays/${folder}/mapping_right.json`).then(res => res.json());
-            const colorLeft = await fetch(`${base}preloadedArrays/${folder}/color_left.json`).then(res => res.json());
-            const colorRight = await fetch(`${base}preloadedArrays/${folder}/color_right.json`).then(res => res.json());
+            const pre = await fetch(`preloadedArrays/${folder}/pre.json`).then(res => res.json());
+            const post = await fetch(`preloadedArrays/${folder}/post.json`).then(res => res.json());
+            const distancesLeft = await fetch(`$preloadedArrays/${folder}/distances_left.json`).then(res => res.json());
+            const distancesRight = await fetch(`preloadedArrays/${folder}/distances_right.json`).then(res => res.json());
+            const mappingsLeft = await fetch(`preloadedArrays/${folder}/mapping_left.json`).then(res => res.json());
+            const mappingsRight = await fetch(`preloadedArrays/${folder}/mapping_right.json`).then(res => res.json());
+            const colorLeft = await fetch(`preloadedArrays/${folder}/color_left.json`).then(res => res.json());
+            const colorRight = await fetch(`preloadedArrays/${folder}/color_right.json`).then(res => res.json());
             return [
                 {label: folder + "_left", value: [[post[0]], [pre[0]]], distances: distancesLeft, mapping: mappingsLeft, selected: false, colorDiff: colorLeft},
                 {label: folder + "_right", value: [[post[1]], [pre[1]]], distances: distancesRight, mapping: mappingsRight, selected: false, colorDiff: colorRight}
