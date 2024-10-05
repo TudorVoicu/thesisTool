@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Select, MenuItem, Checkbox, ListItemText, OutlinedInput, InputLabel, FormControl, SelectChangeEvent } from '@mui/material';
 import { useFiles } from  '../../FilesContext';
+import { CircularProgress } from '@mui/material';
+
 
 type FourDimArray = number[][][][];
 interface Items {
@@ -26,9 +28,8 @@ const PreLoadedFiles: React.FC = () => {
             const distancesRight = await fetch(`${base}preloadedArrays/${folder}/distances_right.json`).then(res => res.json());
             const mappingsLeft = await fetch(`${base}preloadedArrays/${folder}/mapping_left.json`).then(res => res.json());
             const mappingsRight = await fetch(`${base}preloadedArrays/${folder}/mapping_right.json`).then(res => res.json());
-            const colorLeft = await fetch(`${base}preloadedArrays/${folder}/color_right.json`).then(res => res.json());
+            const colorLeft = await fetch(`${base}preloadedArrays/${folder}/color_left.json`).then(res => res.json());
             const colorRight = await fetch(`${base}preloadedArrays/${folder}/color_right.json`).then(res => res.json());
-
             return [
                 {label: folder + "_left", value: [[post[0]], [pre[0]]], distances: distancesLeft, mapping: mappingsLeft, selected: false, colorDiff: colorLeft},
                 {label: folder + "_right", value: [[post[1]], [pre[1]]], distances: distancesRight, mapping: mappingsRight, selected: false, colorDiff: colorRight}
@@ -36,7 +37,8 @@ const PreLoadedFiles: React.FC = () => {
         };
     
         const loadData = async () => {
-            const folders = ['AF_100', 'CST', 'CG', 'IFO'];  // Example folder names, adjust as needed
+            //const folders = ['AF_100', 'CST', 'CG', 'IFO', 'IFO_right', 'SCP'];  // Example folder names, adjust as needed
+            const folders = ['AF', 'AF_100','CG','CST', 'IFO'];
             const promises = folders.map(async folder => await loadJsonData(folder));
             const itemsArray = await Promise.all(promises);
             setItems(itemsArray.flat());
@@ -44,6 +46,28 @@ const PreLoadedFiles: React.FC = () => {
     
         loadData();
     }, []);
+
+    const morphMapping = (mapping: [number[], number[]]): [number[], number[]] => {
+        const [array0, array1] = mapping;
+      
+        // Create a map to store positions of each element in array0
+        const positionInArray0: Record<number, number> = {};
+        array0.forEach((value, index) => {
+          positionInArray0[value] = index;
+        });
+      
+        // Create a map to store positions of each element in array1
+        const positionInArray1: Record<number, number> = {};
+        array1.forEach((value, index) => {
+          positionInArray1[value] = index;
+        });
+      
+        // Create the transformed arrays
+        const transformedArray0 = array0.map(value => positionInArray1[value]);
+        const transformedArray1 = array1.map(value => positionInArray0[value]);
+      
+        return [transformedArray0, transformedArray1];
+      };
     
     //loads the files onto the context's filelist
     useEffect(() => {
@@ -55,12 +79,13 @@ const PreLoadedFiles: React.FC = () => {
                     const perFile = patient.map((tck, index) => ({
                         name: `${label}${item.label}_${index}`,
                         coordinates: tck,
-                        distance: item.distances[index],
-                        mapping: item.mapping[index],
+                        distance: item.distances[(indexit+1)%2],
+                        mapping: item.mapping[(indexit+1)%2],
                         isVisible: true,
                         opacity: 0.5,
                         color: '#fc0328',
-                        colorDiff: item.colorDiff[index]
+                        colorDiff: morphMapping([item.mapping[0], item.mapping[1]])[indexit],
+                        counterCoords: item.colorDiff[(indexit+1)%2] //this is shady af...
                     }));
                     addFileGroup(perFile);
                 });
@@ -183,6 +208,9 @@ const PreLoadedFiles: React.FC = () => {
                     </MenuItem>
                 ))}
             </Select>
+            {items.length === 0 && (<>
+                <CircularProgress sx={{ml:'1rem', mt:'1.5rem'}} color="primary" />
+            </>)}
         </FormControl>
     );
 };

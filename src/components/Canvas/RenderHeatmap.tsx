@@ -45,7 +45,6 @@ const RenderHeatmap: React.FC<RenderHeatmapProps> = ({ projectedCoordinates, onR
     
 
         projectedCoordinates.forEach(file => {
-            console.log(file)
             let prefix = file.name.slice(0, 3);
             let visible = false;
             fileGroups.forEach(f => f.tckFiles.forEach(tckFile => {
@@ -73,9 +72,11 @@ const RenderHeatmap: React.FC<RenderHeatmapProps> = ({ projectedCoordinates, onR
             if(cell.pointDensity < 0){
                 cell.mesh.material.color = new THREE.Color('blue');
                 cell.mesh.material.opacity = cell.pointDensity/min;
+                if(cell.mesh.material.opacity>0)
                 helper.add(cell.mesh);
             }else{
                 cell.mesh.material.opacity = cell.pointDensity/max;
+                if(cell.mesh.material.opacity>0)
                 helper.add(cell.mesh);
             }
         })
@@ -108,8 +109,6 @@ const RenderHeatmap: React.FC<RenderHeatmapProps> = ({ projectedCoordinates, onR
 
 
   React.useEffect(() => {
-    console.log(cellSize)
-    console.log(gridSize)
     // Your heatmap rendering logic here...
     // Once everything is added to the scene, call onRendered with a cleanup function
     if (onRender) {

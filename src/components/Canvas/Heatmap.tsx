@@ -40,7 +40,7 @@ const Heatmap: React.FC<StreamlinesProps> = ({ tckFiles }) => {
 
   useEffect(() => {
     if (heatmap) {
-      const x = tckFiles.map(file => interpolateStreamlines(file, 1));
+      const x = tckFiles.map(file => interpolateStreamlines(file, 0.2));
       
       setInterpolatedStreamlines(x);
       setKey(key=>key+1);
@@ -66,7 +66,9 @@ const Heatmap: React.FC<StreamlinesProps> = ({ tckFiles }) => {
 
   useEffect(() => {
     if (!interpolatedStreamlines || !heatmap) return;
-
+  
+    console.time("Execution Time"); // Start the timer
+  
     // Adjusted logic to use the new projection function
     const projectedStreamlines = interpolatedStreamlines.map((file) => {
       const projectedCoordinates = file.interpolatedCoordinates.map((streamline) =>
@@ -75,25 +77,24 @@ const Heatmap: React.FC<StreamlinesProps> = ({ tckFiles }) => {
           return projectPointOntoCameraViewPlane(pointVector, camera);
         })
       );
-
+  
       return {
         ...file,
         projectedCoordinates,
       };
     });
-
-    setProjectedCoords(projectedStreamlines.map(proj => ({
-      coordinates: proj.projectedCoordinates,
-      name: proj.name,
-    })));
+  
+    setProjectedCoords(
+      projectedStreamlines.map((proj) => ({
+        coordinates: proj.projectedCoordinates,
+        name: proj.name,
+      }))
+    );
+  
+    console.timeEnd("Execution Time"); // End the timer and log the result
   }, [key]);
 
-  // useEffect(() => {
-  //   console.log("haery");
-  // })
-
   useEffect(() => {
-    console.log(projectedCoords);
     if (cleanupRef.current) {
       cleanupRef.current(); // Cleanup previous visualization if exists
   }

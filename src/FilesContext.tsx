@@ -8,9 +8,10 @@ interface TckFile {
   isVisible: boolean;
   color: string;
   opacity: number;
-  mapping :number[] | [];
+  mapping :number[];
   distance : number[][] | [];
-  colorDiff: number[][] | []
+  colorDiff: number[];
+  counterCoords: number[][] | [];
 }
 
 interface FileGroup {
@@ -23,7 +24,7 @@ interface StreamlinesProps {
   tckFiles: TckFile[];
   mapping?: number[];
   distances?: number[][];
-  colorDiff?: number[][];
+  colorDiff?: number[];
 }
 
 interface CameraState {
@@ -77,6 +78,8 @@ interface FilesContextType {
   viewFlow:boolean;
   toggleViewDistances: () => void;
   toggleViewFlow: () => void;
+  viewDirColoring:boolean;
+  toggleViewDirColoring: () => void;
 }
 
 const FilesContext = createContext<FilesContextType | undefined>(undefined);
@@ -98,15 +101,24 @@ export const FilesProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
   const [viewDistances, setViewDistances] = useState<boolean>(false);
   const [viewFlow, setViewFlow] = useState<boolean>(false);
+  const [viewDirColoring, setViewDirColoring] = useState<boolean>(false);
+
+  const toggleViewDirColoring = () => {
+    setViewDirColoring(!viewDirColoring)
+    setViewFlow(false)
+    setViewDistances(false)
+  }
 
   const toggleViewDistances = () => {
     setViewDistances(!viewDistances);
     setViewFlow(false);
+    setViewDirColoring(false);
   }
 
   const toggleViewFlow = () => {
     setViewFlow(!viewFlow);
     setViewDistances(false);
+    setViewDirColoring(false);
   }
 
   const [cellSize, setCellSize] = useState<number>(0.05);
@@ -232,8 +244,10 @@ export const FilesProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       emptyFileGroup,
       toggleViewDistances,
       toggleViewFlow,
+      toggleViewDirColoring,
       viewDistances,
-      viewFlow
+      viewFlow,
+      viewDirColoring
     }}>
       {children}
     </FilesContext.Provider>

@@ -14,6 +14,7 @@ const ThreeCanvas = () => {
   useEffect(() => {
     if (controls.current) {
       const handleChange = () => {
+        if(!controls.current)  return;
         const { x, y, z } = controls.current.object.position;
         updateCameraPosition({ position: [x, y, z] });
       };

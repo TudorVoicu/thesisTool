@@ -1,21 +1,26 @@
 //FileList.tsx
 import React from 'react';
 import { useFiles } from '../../FilesContext';
-import { Checkbox, FormControlLabel, Slider, TextField, Switch, Button, Box } from '@mui/material';
+import { Checkbox, FormControlLabel, Slider, TextField, Switch, Button, Box, FormGroup, AccordionDetails, Accordion, Typography, AccordionSummary } from '@mui/material';
 import PreLoadedFiles from './PreLoadedFiles';
+import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
+import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 
 const FileList: React.FC = () => {
   const { fileGroups, toggleTckFileVisibility, changeTckFileColor, changeTckFileOpacity, toggleAllInOneScene, makeHeatmap, 
-    makeStreamlines, heatmap, streamlines, setCellSize, setGridSize, changeColoringFiles, setMaxColorDistance, toggleViewDistances, synchronizeCameras, cameraState, toggleViewFlow, viewDistances, viewFlow } = useFiles();
+    makeStreamlines, heatmap, streamlines, setCellSize, setGridSize, changeColoringFiles, setMaxColorDistance, toggleViewDistances, 
+    synchronizeCameras, cameraState, toggleViewFlow, viewDistances, viewFlow, viewDirColoring, toggleViewDirColoring } = useFiles();
 
   const [isColored, setIsColored] = React.useState<boolean>(false);
 
   const [internalViewFlow, setInternalViewFlow] = React.useState(viewFlow);
   const [internalViewDistances, setInternalViewDistnaces] = React.useState(viewDistances);
+  const [internalViewDirColoring, setInternalViewDirColoring] = React.useState(viewDirColoring);
 
   const [internalDistanceMeter, setInternalDistanceMeter] = React.useState(20);
   const [internalFlowMeter, setInternalFlowMeter] = React.useState(0.25);
   const [internalMeter, setInternalMeter] = React.useState(0);
+  const [inputValue, setInputValue] = React.useState(internalMeter.toString()); // Input field value
 
   React.useEffect(() => {
     setInternalViewDistnaces(viewDistances);
@@ -26,6 +31,10 @@ const FileList: React.FC = () => {
     setInternalViewFlow(viewFlow);
     if(viewFlow)  setInternalMeter(internalFlowMeter);
   }, [viewFlow]);
+
+  React.useEffect(() => {
+    setInternalViewDirColoring(viewDirColoring);
+  })
 
   const [value, setValue] = React.useState<string>("");
 
@@ -49,7 +58,11 @@ const FileList: React.FC = () => {
     setGridSize(step);
   }
 
-  const customValues = [0.2, 0.1, 0.05, 0.02, 0.01];
+  const dirColoring = () => {
+    toggleViewDirColoring()
+  }
+
+  const customValues = [0.2, 0.1, 0.05, 0.02, 0.01, 0.005, 0.002];
 
   const heatmapMarks = customValues.map((value, index) => ({
     value: (100 / (customValues.length - 1)) * index,
@@ -88,13 +101,17 @@ const FileList: React.FC = () => {
   }
 
   function handleChange(event: React.ChangeEvent<HTMLInputElement>): void {
-    const newValue = parseFloat(event.target.value);
-    console.log(newValue)
-        // Check if the new value is a non-negative number
-        if (newValue) {
-            if(internalViewDistances) setInternalDistanceMeter(newValue);
-            else  setInternalFlowMeter(newValue);
-            setInternalMeter(newValue);
+    const value = event.target.value;
+    setInputValue(value);
+
+    // Attempt to parse the input value to a number
+    const numberValue = parseFloat(value);
+
+          // Check if the new value is a non-negative number
+        if (numberValue && !isNaN(numberValue) && numberValue > 0) {
+            if(internalViewDistances) setInternalDistanceMeter(numberValue);
+            else  setInternalFlowMeter(numberValue);
+            setInternalMeter(numberValue);
         }
   }
 
@@ -103,45 +120,65 @@ const FileList: React.FC = () => {
   }, [internalMeter])
 
   return (
-    <>
+    <Box sx={{mr:1, ml:1}}>
     <div className="file-list">
       <PreLoadedFiles />
-      <FormControlLabel
-        control={<Switch onChange={handleAllInOneScene} />}
-        label="Superimposed"
-      />
+      <FormGroup>
+      <Accordion>
+        <AccordionSummary
+          expandIcon={<ArrowDownwardIcon />}
+          aria-controls="panel1a-content"
+          id="panel1a-header"
+        >
+        <Typography>Streamlines Settings</Typography>
+        </AccordionSummary>
+        <AccordionDetails>
+          <FormGroup sx={{ ml: 2 }}>
+            <FormControlLabel
+              control={<Switch onChange={streamlinesVis} defaultChecked />}
+              label="Streamlines"
+            />
+            <FormControlLabel
+              control={<Switch onChange={handleAllInOneScene} />}
+              label="Superimposed"
+            />
+            <FormControlLabel
+              control={<Switch onChange={dirColoring} checked={internalViewDirColoring}/>}
+              label="Directional Coloring"
+            />
+          </FormGroup>
+        </AccordionDetails>
+      </Accordion>
+
       <FormControlLabel
         control={<Switch onChange={heatmaps} />}
+        sx={{mt:'0.5rem'}}
         label="HeatMap"
       />
+      
       <FormControlLabel
-        control={<Switch onChange={streamlinesVis} defaultChecked />}
-        label="Streamlines"
-      />
-      {/* <FormControlLabel
-        control={<Switch onChange={() => synchronizeCameras(!cameraState.synchronized)} defaultChecked/>}
-        label="Syncronize Cameras"
-      /> */}
-      <FormControlLabel
-        control={<Switch onChange={toggleViewDistances} checked={internalViewDistances}/>}
+        control={<Switch onChange={toggleViewDistances} checked={internalViewDistances} />}
         label="Distance Coloring"
       />
       <FormControlLabel
-        control={<Switch onChange={toggleViewFlow} checked={internalViewFlow}/>}
+        control={<Switch onChange={toggleViewFlow} checked={internalViewFlow} />}
         label="Flow Coloring"
       />
+    </FormGroup>
+    {(viewDistances || viewFlow) && (
       <TextField
-            type="number"
-            label="Set Max Distance"
-            variant="outlined"
-            value={internalMeter}
-            onChange={handleChange}
-            inputProps={{ min: 0, step: 1 }}  // ensures only numbers >= 0 can be entered
-            fullWidth
-            sx={{marginTop : '1rem', marginBottom:'1rem'}}
-          />
+        type="text" // Use text to allow empty input
+        label="Set Max Distance"
+        variant="outlined"
+        value={inputValue}
+        onChange={handleChange}
+        fullWidth
+        sx={{ marginTop: '1rem', marginBottom: '1rem' }}
+      />
+    )}
+    
       {heatmap && (
-        <div>
+        <Box sx={{marginRight:'1rem'}}> 
           <Slider
           defaultValue={50}
           step={100 / (customValues.length - 1)} // Equal spacing
@@ -157,8 +194,9 @@ const FileList: React.FC = () => {
           min={100}
           max={500}
           />  
-        </div>
+        </Box>
       )}
+      <Box sx={{mt:'1rem'}}></Box>
       {streamlines && (
         <>
           {fileGroups.map((group, groupIndex) => (
@@ -215,7 +253,7 @@ const FileList: React.FC = () => {
 
       
     </div>
-    </>
+    </Box>
   );
 };
 

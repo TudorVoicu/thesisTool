@@ -1,6 +1,6 @@
 // SynchronizedOrbitControls.tsx
-import React, { useRef, useEffect } from 'react';
-import { PerspectiveCamera, OrthographicCamera } from 'three';
+import React, { useEffect } from 'react';
+import { PerspectiveCamera } from 'three';
 import { OrbitControls } from '@react-three/drei';
 import { useFiles } from '../../FilesContext';
 import { useThree } from '@react-three/fiber';
@@ -15,6 +15,7 @@ const SynchronizedOrbitControls : React.FC<SynchronizedOrbitControlsProps> = ({ 
   useEffect(() => {
     if (controlsRef.current) {
       const handleChange = () => {
+        if(!controlsRef.current || controlsRef.current.object)  return;
         const { x, y, z } = controlsRef.current.object.position;
         updateCameraPosition({
           position: [x, y, z],

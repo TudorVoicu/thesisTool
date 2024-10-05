@@ -9,7 +9,7 @@ const App = () => {
   return (
     <FilesProvider> {/* Wrap the component tree that needs access to the files context */}
       <PanelGroup direction="horizontal" style={{width: '100vw', display: 'flex' }}>
-        <Panel defaultSize={15} minSize={5} className="upload-area" style={{ overflow: 'auto', display: 'flex', flexDirection: 'column' }}>
+        <Panel defaultSize={17} minSize={5} className="upload-area" style={{ overflow: 'auto', display: 'flex', flexDirection: 'column' }}>
             {/* <Upload /> Assuming Upload component does not need to scroll */}
             <FileList /> {/* FileList will have the scrolling capability if it overflows */}
         </Panel>
