@@ -183,14 +183,14 @@ const FileList: React.FC = () => {
           defaultValue={50}
           step={100 / (customValues.length - 1)} // Equal spacing
           valueLabelDisplay="auto"
-          valueLabelFormat={(value) => getCustomValue(value)}
-          onChangeCommitted={(_e, value) => cellSizeSlider(value as number)}
+          valueLabelFormat={(value: any) => getCustomValue(value)}
+          onChangeCommitted={(_e: any, value: number) => cellSizeSlider(value as number)}
           marks={heatmapMarks}
           />  
           <Slider
           defaultValue={200}
           step={100} // Equal spacing
-          onChangeCommitted={(_e, value) => gridSizeSlider(value as number)}
+          onChangeCommitted={(_e: any, value: number) => gridSizeSlider(value as number)}
           min={100}
           max={500}
           />  
@@ -222,7 +222,7 @@ const FileList: React.FC = () => {
                       min={0}
                       max={1}
                       step={0.01}
-                      onChangeCommitted={(_e, value) =>
+                      onChangeCommitted={(_e: any, value: number) =>
                         changeTckFileOpacity(groupIndex, fileIndex, value as number)}
                     />
                     <TextField
